@@ -11,6 +11,13 @@ class Ingredient {
         $this->db = Database::getInstance()->getConnection();
     }
 
+    /**
+     * Get database connection (for use in other models)
+     */
+    public function getConnection() {
+        return $this->db;
+    }
+
     public function getAll() {
         $stmt = $this->db->query("SELECT * FROM ingredients ORDER BY name ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -20,6 +27,18 @@ class Ingredient {
         $stmt = $this->db->prepare("SELECT * FROM ingredients WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get ingredients with low stock (at or below minimum)
+     */
+    public function getLowStock() {
+        $stmt = $this->db->query("
+            SELECT * FROM ingredients 
+            WHERE current_stock <= min_stock AND min_stock > 0
+            ORDER BY current_stock ASC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function create($data) {

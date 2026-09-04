@@ -31,7 +31,7 @@ function isActiveRoute($path, $uriPath) {
 <!-- Sidebar -->
 <aside 
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-    class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-surface border-r border-border transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-surface border-r border-border transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:w-80"
 >
     <!-- Logo/Brand -->
     <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-border">

@@ -1,11 +1,15 @@
-<div class="mb-6 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-        <a href="<?= BASE_URL ?>/products" class="text-textSecondary hover:text-primary transition-colors duration-200 bg-surface p-1.5 rounded-md border border-border cursor-pointer shadow-sm">
+<div class="flex flex-col h-full">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3 mb-6">
+        <a href="<?= BASE_URL ?>" class="text-textSecondary hover:text-primary transition-colors bg-surface p-2 rounded-md border border-border shadow-sm">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
         </a>
-        <h2 class="text-xl font-semibold text-textPrimary"><?= htmlspecialchars($title) ?></h2>
+        <div>
+            <h1 class="text-2xl font-bold text-textPrimary"><?= htmlspecialchars($title) ?></h1>
+            <p class="text-sm text-textSecondary mt-1">Kelola informasi produk dan varian yang dijual.</p>
+        </div>
     </div>
 </div>
 
@@ -26,7 +30,7 @@
     
     <!-- Left Column: Main Form -->
     <div class="lg:col-span-2 space-y-6">
-        <form action="<?= BASE_URL ?>/products/save<?= $product ? '/' . $product['id'] : '' ?>" method="POST" id="productForm" class="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-6">
+        <form action="<?= BASE_URL ?>/products/save<?= $product ? '/' . $product['id'] : '' ?>" method="POST" id="productForm" class="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-6 w-full">
             
             <h3 class="text-base font-bold text-textPrimary border-b border-border pb-2">Informasi Dasar</h3>
             

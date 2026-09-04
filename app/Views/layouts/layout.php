@@ -83,9 +83,16 @@
         </div>
     <?php else : ?>
         <!-- Plain Layout (e.g., for Login, Error pages, Public QR Menu) -->
-        <div class="min-h-screen flex items-center justify-center">
-            <?= $content ?>
-        </div>
+        <?php if (isset($isPosLayout) && $isPosLayout) : ?>
+            <!-- Specifically for POS so it uses full screen without centering -->
+            <div class="h-screen w-full flex flex-col overflow-hidden bg-background">
+                <?= $content ?>
+            </div>
+        <?php else : ?>
+            <div class="min-h-screen flex items-center justify-center">
+                <?= $content ?>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 
     <!-- Global Dialog/Alert Component container -->

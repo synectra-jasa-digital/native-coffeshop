@@ -64,4 +64,39 @@ $router->get('/inventory/opname/create', 'InventoryController', 'formOpname');
 $router->post('/inventory/opname/submit', 'InventoryController', 'submitOpname');
 $router->post('/inventory/opname/status/:id', 'InventoryController', 'updateOpnameStatus');
 
+// Protected Routes - POS
+$router->get('/pos', 'PosController', 'index');
+$router->post('/pos/checkout', 'PosController', 'checkout');
+
+// Protected Routes - Shift
+$router->get('/shift/open', 'ShiftController', 'formOpen');
+$router->post('/shift/open', 'ShiftController', 'processOpen');
+$router->get('/shift/close', 'ShiftController', 'formClose');
+$router->post('/shift/close', 'ShiftController', 'processClose');
+$router->get('/shift/history', 'ShiftController', 'history');
+
+// Protected Routes - Transactions
+$router->get('/transactions', 'TransactionController', 'index');
+$router->get('/transactions/:id', 'TransactionController', 'detail');
+$router->post('/transactions/:id/void', 'TransactionController', 'void');
+
+// Protected Routes - Settings
+$router->get('/settings', 'SettingController', 'index');
+$router->post('/settings/save', 'SettingController', 'save');
+
+// Protected Routes - Reports (Modul F)
+$router->get('/laporan/penjualan-harian', 'ReportController', 'harian');
+$router->get('/laporan/stok', 'ReportController', 'stok');
+$router->get('/laporan/kasir-shift', 'ReportController', 'kasir_shift');
+
+// Protected Routes - Users (Modul G)
+$router->get('/users', 'UserController', 'index');
+$router->get('/users/create', 'UserController', 'create');
+$router->post('/users/save', 'UserController', 'save');
+$router->get('/users/edit/:id', 'UserController', 'edit');
+$router->post('/users/save/:id', 'UserController', 'save');
+$router->post('/users/delete/:id', 'UserController', 'delete');
+$router->post('/users/reset-password/:id', 'UserController', 'resetPassword');
+$router->get('/activity-logs', 'UserController', 'activityLogs');
+
 return $router;

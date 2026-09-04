@@ -74,7 +74,7 @@ class AuthController extends Controller {
      */
     public function logout() {
         Session::destroy();
-        Session::start(); // Start new session to set flash message
+        Session::init(); // Start new session to set flash message
         Session::setFlash('info', 'Anda telah berhasil keluar dari sistem.');
         $this->redirect('login');
     }

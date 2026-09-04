@@ -6,33 +6,56 @@ use App\Core\Session;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Shift;
+use App\Models\Setting;
 
 class PosController extends Controller {
     private $productModel;
     private $categoryModel;
     private $orderModel;
+    private $shiftModel;
+    private $settingModel;
 
     public function __construct() {
         if (!Session::has('user_id')) {
             $this->redirect('login');
         }
 
-        // Everyone basically can access POS, except maybe strictly Barista.
-        // For now, let's allow all active users.
+        // Restrict to Admin, Manager, Kasir
+        $role = Session::get('user_role_name');
+        if (!in_array($role, ['Admin', 'Manager', 'Kasir'])) {
+            Session::setFlash('error', 'Anda tidak memiliki akses ke POS.');
+            $this->redirect('');
+        }
         
         $this->productModel = new Product();
         $this->categoryModel = new Category();
         $this->orderModel = new Order();
+        $this->shiftModel = new Shift();
+        $this->settingModel = new Setting();
     }
 
     /**
      * Display POS Interface
      */
     public function index() {
-        // We will pass minimal layout or a full app layout. Let's use full app layout but customized.
+        $userId = Session::get('user_id');
+
+        // Cek apakah ada shift terbuka
+        $openShift = $this->shiftModel->getOpenShift($userId);
+
+        if (!$openShift) {
+            // Belum ada shift terbuka, redirect ke buka shift
+            Session::setFlash('warning', 'Anda harus membuka shift terlebih dahulu sebelum menggunakan POS.');
+            $this->redirect('shift/open');
+        }
+
+        // Simpan shift_id di session
+        Session::set('shift_id', $openShift['id']);
+
         $categories = $this->categoryModel->getAll(true); // Active only
         
-        // Let's get all active products with variants
+        // Get all active products with variants
         $products = $this->productModel->getAll(null);
         $activeProducts = [];
         
@@ -43,21 +66,17 @@ class PosController extends Controller {
             }
         }
 
-        // Pass simple settings for Tax and Service Charge
-        // In a real app, query from Settings table
-        $settings = [
-            'tax_rate' => 11.00, // 11%
-            'is_tax_active' => true,
-            'service_charge_rate' => 5.00,
-            'is_service_charge_active' => false // Disable for simplicity unless requested
-        ];
+        // Get tax & service charge settings from database
+        $taxSettings = $this->settingModel->getTaxSettings();
 
         $this->view('pages/pos/index', [
             'title' => 'Point of Sale',
             'categories' => $categories,
             'products' => $activeProducts,
-            'settings' => $settings,
-            // To make POS wider, we could pass a flag to layout to hide sidebar, but let's stick to default for now
+            'settings' => $taxSettings,
+            'shift' => $openShift,
+            'isAppLayout' => false,
+            'isPosLayout' => true
         ]);
     }
 
@@ -67,6 +86,14 @@ class PosController extends Controller {
     public function checkout() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->json(['success' => false, 'message' => 'Invalid method'], 400);
+        }
+
+        $userId = Session::get('user_id');
+
+        // Cek shift
+        $openShift = $this->shiftModel->getOpenShift($userId);
+        if (!$openShift) {
+            return $this->json(['success' => false, 'message' => 'Tidak ada shift terbuka. Buka shift terlebih dahulu.'], 400);
         }
 
         // Read JSON payload from Alpine.js
@@ -80,16 +107,16 @@ class PosController extends Controller {
         // Validate and prepare data
         $orderData = [
             'order_type' => $data['order_type'] ?? 'dine_in',
-            'table_id' => null, // Simplified for now
+            'table_id' => $data['table_id'] ?? null,
             'total_amount' => $data['grand_total']
         ];
 
         $transactionData = [
-            'shift_id' => 1, // Dummy shift ID for now. Need Shift Management later.
+            'shift_id' => $openShift['id'],
             'subtotal' => $data['subtotal'],
             'tax' => $data['tax_amount'],
-            'service_charge' => 0,
-            'discount' => 0,
+            'service_charge' => $data['service_charge'] ?? 0,
+            'discount' => $data['discount'] ?? 0,
             'total' => $data['grand_total'],
             'payment_method' => $data['payment_method'] ?? 'cash'
         ];
@@ -108,7 +135,12 @@ class PosController extends Controller {
         $orderId = $this->orderModel->createCompleteOrder($orderData, $items, $transactionData);
 
         if ($orderId) {
-            return $this->json(['success' => true, 'message' => 'Transaksi berhasil.', 'order_id' => $orderId]);
+            return $this->json([
+                'success' => true, 
+                'message' => 'Transaksi berhasil.', 
+                'order_id' => $orderId,
+                'change' => max(0, ($data['cash_received'] ?? 0) - $data['grand_total'])
+            ]);
         } else {
             return $this->json(['success' => false, 'message' => 'Gagal memproses transaksi.'], 500);
         }

@@ -1,0 +1,24 @@
+{
+  "name": "native-coffeshop",
+  "version": "1.0.0",
+  "description": "Sistem Point of Sale (POS), Manajemen Stok (Inventory), dan Laporan khusus untuk Coffee Shop skala tunggal (Single Outlet).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/synectra-jasa-digital/native-coffeshop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/synectra-jasa-digital/native-coffeshop/issues"
+  },
+  "homepage": "https://github.com/synectra-jasa-digital/native-coffeshop#readme",
+  "dependencies": {
+    "@browsermcp/mcp": "^0.1.3"
+  }
+}

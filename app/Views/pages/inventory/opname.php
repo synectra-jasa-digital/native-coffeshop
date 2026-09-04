@@ -28,7 +28,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Selisih</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Oleh</th>
-                        <th scope="col" class="relative px-6 py-3"><span class="sr-only">Aksi</span></th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -82,10 +82,20 @@
                                 <?= htmlspecialchars($opname['user_name']) ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <?php if($opname['status'] === 'pending' && in_array(\App\Core\Session::get('user_role_name'), ['Admin', 'Manager'])): ?>
-                                    <button onclick="updateStatus(<?= $opname['id'] ?>, 'approved')" class="text-green-600 hover:text-green-900 mr-3">Setujui</button>
-                                    <button onclick="updateStatus(<?= $opname['id'] ?>, 'rejected')" class="text-red-600 hover:text-red-900">Tolak</button>
-                                <?php endif; ?>
+                                <div class="flex justify-end gap-2">
+                                    <?php if($opname['status'] === 'pending' && in_array(\App\Core\Session::get('user_role_name'), ['Admin', 'Manager'])): ?>
+                                        <button onclick="updateStatus(<?= $opname['id'] ?>, 'approved')" class="text-green-600 hover:text-green-800 bg-green-50 p-1.5 rounded border border-green-200 hover:bg-green-100 transition-colors duration-200 cursor-pointer" title="Setujui">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </button>
+                                        <button onclick="updateStatus(<?= $opname['id'] ?>, 'rejected')" class="text-danger hover:text-red-800 bg-red-50 p-1.5 rounded border border-red-200 hover:bg-red-100 transition-colors duration-200 cursor-pointer" title="Tolak">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
