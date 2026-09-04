@@ -31,6 +31,14 @@ Sistem Point of Sale (POS), Manajemen Stok (Inventory), dan Laporan khusus untuk
   - `pages/`: Halaman-halaman fitur spesifik.
 - `app/Core/`: File-file inti framework custom (Router, Database wrapper, Base Controller).
 
+## Fitur Utama
+
+- **Point of Sale (POS):** Antarmuka kasir cepat dengan interaksi AJAX (Alpine.js) dan fitur buka/tutup Shift. Mendukung cetak struk Thermal 58mm.
+- **KDS & Manajemen Meja:** QR Code Menu digital (*responsive* web/mobile) terintegrasi langsung dengan Kitchen Display System (KDS) yang mengurangi stok bahan otomatis secara akurat.
+- **Role-Based Access Control (RBAC):** Dashboard terpisah dengan widget unik dan sidebar khusus berdasarkan akses (Admin, Manager, Kasir, Dapur). Perekaman Log Aktivitas lengkap.
+- **Manajemen Inventori & Produk:** Variasi produk, resep HPP dinamis, dan *Stock Opname* sinkron langsung ke database dan log pergerakan stok tanpa hambatan *pending approval*.
+- **Pelaporan & Ekspor PDF:** Laporan Keuangan (Harian, Bulanan, Tahunan) format Akuntansi resmi (font Times New Roman, pengkategorian tunai/non-tunai, kolom pengesahan).
+
 ## Desain & UI
 
-Pengaturan warna dan layout berpedoman penuh pada `DESIGN_GUIDELINE.md`. Tampilan utama menggunakan skema **Operate** (Utilitarian, padat, responsif). Menggunakan Tailwind CDN.
+Pengaturan warna dan layout berpedoman penuh pada `DESIGN_GUIDELINE.md` dan panduan desain internal. Tampilan utama menggunakan skema **Operate Mode** (Utilitarian, padat, responsif Inter) pada dashboard internal dan **Persuade Mode** (Ruang bernafas lega, font Playfair Display) pada area eksternal pelanggan (Digital Menu). Menggunakan Tailwind CDN.

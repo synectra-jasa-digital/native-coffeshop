@@ -13,13 +13,13 @@
 ---
 
 ### Catatan Rilis Terakhir
-- **Fase 1 (MVP) Sebagian Besar Sudah Selesai.**
+- **Fase 1 (MVP) dan Fase 2 (Manajemen Lanjut) Telah Selesai 100%.**
 - Telah diperbaiki masalah URL routing pada `index.php` dan `Router.php` sehingga dapat diakses via subdirektori (localhost/native-coffeshop).
 - Model `Category` dan `Product` ditambahkan beserta method CRUD.
-- Tampilan list produk dan kelola kategori interaktif dengan modal Alpine.js dan Fetch API.
-- **Modul B (Point of Sale) Selesai:** Model Shift, Transaction, Table, Setting; Buka/Tutup Shift; POS Interface (Alpine.js Cart); Checkout; Riwayat Transaksi; Detail Transaksi; Void Transaksi.
-- **Modul F (Laporan Dasar) Selesai:** Laporan Penjualan Harian; Laporan Stok & Nilai Stok; Laporan Kinerja Kasir per Shift.
-- **Modul G (Manajemen Pengguna) Selesai:** CRUD Pengguna; Role Management; Log Aktivitas (Audit Trail).
+- **Modul Menu Digital & KDS (Selesai):** Responsive Menu Web/Mobile, KDS dengan sinkronisasi pengeluaran tabel bahan baku.
+- **Modul B (Point of Sale) Selesai:** POS Interface (Alpine.js Cart), Buka/Tutup Shift dengan rekonsiliasi, Checkout AJAX, Cetak Struk Thermal 58mm, Riwayat Transaksi.
+- **Modul F (Laporan Akuntansi) Selesai:** Ekspor PDF bergaya Times New Roman (Harian, Bulanan, Tahunan), Stock Opname langsung sinkron tanpa status pending.
+- **Modul G (Manajemen Pengguna) Selesai:** Dashboard terpisah tiap Role, Sidebar Terpisah tiap Role, Log Aktivitas terhubung antar aksi.
 - **Modul H (Pengaturan Sistem) Selesai:** Pengaturan Info Toko; Pajak & Service Charge; Metode Pembayaran.
 
 ### File yang Dibuat atau Diubah

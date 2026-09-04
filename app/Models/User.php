@@ -9,6 +9,11 @@ class User {
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
+        try {
+            $this->db->exec("ALTER TABLE `users` ADD COLUMN `avatar_url` VARCHAR(255) NULL AFTER `email`");
+        } catch (\PDOException $e) {
+            // Column already exists
+        }
     }
 
     /**
@@ -41,7 +46,7 @@ class User {
      */
     public function getById($id) {
         $stmt = $this->db->prepare("
-            SELECT u.id, u.name, u.username, u.email, u.status, u.role_id, r.name as role_name 
+            SELECT u.id, u.name, u.username, u.email, u.avatar_url, u.status, u.role_id, r.name as role_name 
             FROM users u 
             JOIN roles r ON u.role_id = r.id 
             WHERE u.id = :id
@@ -57,7 +62,7 @@ class User {
      */
     public function getAll($roleId = null) {
         $sql = "
-            SELECT u.id, u.name, u.username, u.email, u.status, u.role_id, r.name as role_name 
+            SELECT u.id, u.name, u.username, u.email, u.avatar_url, u.status, u.role_id, r.name as role_name 
             FROM users u 
             JOIN roles r ON u.role_id = r.id 
             WHERE 1=1
@@ -134,6 +139,40 @@ class User {
             $stmt = $this->db->prepare("UPDATE users SET status = 'inactive' WHERE id = :id");
             return $stmt->execute([':id' => $id]);
         }
+    }
+
+    /**
+     * Update user profile basic info (name, email, avatar_url)
+     */
+    public function updateProfile($id, $data) {
+        $stmt = $this->db->prepare("UPDATE users SET name = :name, email = :email, avatar_url = :avatar_url WHERE id = :id");
+        return $stmt->execute([
+            ':id' => $id,
+            ':name' => $data['name'],
+            ':email' => !empty($data['email']) ? $data['email'] : null,
+            ':avatar_url' => $data['avatar_url'] ?? null
+        ]);
+    }
+
+    /**
+     * Update user password
+     */
+    public function updatePassword($id, $newPassword) {
+        $stmt = $this->db->prepare("UPDATE users SET password = :password WHERE id = :id");
+        return $stmt->execute([
+            ':id' => $id,
+            ':password' => password_hash($newPassword, PASSWORD_DEFAULT)
+        ]);
+    }
+
+    /**
+     * Verify user password against database hash
+     */
+    public function verifyPassword($id, $password) {
+        $stmt = $this->db->prepare("SELECT password FROM users WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $hash = $stmt->fetchColumn();
+        return $hash && password_verify($password, $hash);
     }
 
     /**

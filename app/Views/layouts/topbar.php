@@ -25,6 +25,13 @@
     <div class="flex items-center gap-4">
         <!-- Optional: Notification Bell -->
         
+<?php
+$userAvatar = \App\Core\Session::get('user_avatar');
+if (!$userAvatar && \App\Core\Session::has('user_id')) {
+    $userAvatar = (new \App\Models\User())->getById(\App\Core\Session::get('user_id'))['avatar_url'] ?? null;
+    \App\Core\Session::set('user_avatar', $userAvatar);
+}
+?>
         <!-- User Dropdown (Alpine.js) -->
         <div class="relative" x-data="{ open: false }">
             <button 
@@ -32,8 +39,12 @@
                 @click.away="open = false"
                 class="flex items-center gap-2 rounded-md p-2 hover:bg-background focus:outline-none transition-colors"
             >
-                <div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                    <?= substr(\App\Core\Session::get('user_name') ?? 'U', 0, 1) ?>
+                <div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden border border-border shrink-0">
+                    <?php if (!empty($userAvatar)): ?>
+                        <img src="<?= htmlspecialchars($userAvatar) ?>" alt="Avatar" class="w-full h-full object-cover">
+                    <?php else: ?>
+                        <?= strtoupper(substr(\App\Core\Session::get('user_name') ?? 'U', 0, 1)) ?>
+                    <?php endif; ?>
                 </div>
                 <div class="hidden text-left sm:block">
                     <div class="text-sm font-medium text-textPrimary leading-none">

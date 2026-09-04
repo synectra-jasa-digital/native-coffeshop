@@ -19,8 +19,10 @@ $router->get('/login', 'AuthController', 'showLogin');
 $router->post('/login', 'AuthController', 'processLogin');
 $router->get('/logout', 'AuthController', 'logout');
 
-// Protected Routes - Dashboard
+// Protected Routes - Dashboard & Profile
 $router->get('/', 'HomeController', 'index');
+$router->get('/profile', 'ProfileController', 'index');
+$router->post('/profile/save', 'ProfileController', 'save');
 
 // Protected Routes - Products
 $router->get('/products', 'ProductController', 'index');
