@@ -2,14 +2,17 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Database;
 use App\Core\Session;
 use App\Models\Transaction;
 use App\Models\Shift;
 use App\Models\Ingredient;
 use App\Models\StockMovement;
 use App\Models\User;
+use PDO;
 
 class ReportController extends Controller {
+    private $db;
     private $transactionModel;
     private $shiftModel;
     private $ingredientModel;
@@ -27,6 +30,7 @@ class ReportController extends Controller {
             $this->redirect('');
         }
 
+        $this->db = Database::getInstance()->getConnection();
         $this->transactionModel = new Transaction();
         $this->shiftModel = new Shift();
         $this->ingredientModel = new Ingredient();

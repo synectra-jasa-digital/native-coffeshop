@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/synectra-jasa-digital/native-coffeshop#readme",
   "dependencies": {
-    "@browsermcp/mcp": "^0.1.3"
+    "@browsermcp/mcp": "^0.1.3",
+    "puppeteer-core": "^25.10.0"
   }
 }
