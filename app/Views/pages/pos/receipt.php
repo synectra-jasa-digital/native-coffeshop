@@ -31,6 +31,9 @@
 </head>
 <body>
     <div class="text-center border-bottom">
+        <?php if (!empty($settings['store_logo'])): ?>
+            <img src="<?= htmlspecialchars($settings['store_logo']) ?>" alt="Logo" style="max-width: 38mm; max-height: 18mm; margin-bottom: 4px; object-fit: contain; filter: grayscale(100%);">
+        <?php endif; ?>
         <div class="brand-title"><?= htmlspecialchars($settings['store_name'] ?? 'GOOD COFFEE') ?></div>
         <div><?= htmlspecialchars($settings['store_address'] ?? 'Alamat Toko') ?></div>
         <div>Telp: <?= htmlspecialchars($settings['store_phone'] ?? '-') ?></div>

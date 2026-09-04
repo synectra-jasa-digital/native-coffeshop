@@ -74,6 +74,7 @@ class Setting {
             'address' => $this->get('store_address') ?? '',
             'phone' => $this->get('store_phone') ?? '',
             'footer' => $this->get('receipt_footer') ?? '',
+            'logo' => $this->get('store_logo') ?? '',
         ];
     }
 

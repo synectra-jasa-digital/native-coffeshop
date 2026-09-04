@@ -58,6 +58,51 @@ class SettingController extends Controller {
             'receipt_footer' => trim($_POST['receipt_footer'] ?? ''),
         ];
 
+        // Handle logo deletion
+        if (isset($_POST['remove_logo']) && $_POST['remove_logo'] == '1') {
+            $currentLogo = $this->settingModel->get('store_logo');
+            if ($currentLogo) {
+                $relativePath = parse_url($currentLogo, PHP_URL_PATH);
+                $filePathPublic = dirname(__DIR__, 2) . '/public' . $relativePath;
+                $filePathRoot = dirname(__DIR__, 2) . $relativePath;
+                if (file_exists($filePathPublic)) @unlink($filePathPublic);
+                if (file_exists($filePathRoot)) @unlink($filePathRoot);
+            }
+            $data['store_logo'] = '';
+        }
+
+        // Handle file upload for cafe logo
+        if (isset($_FILES['store_logo']) && $_FILES['store_logo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['store_logo'];
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
+            $fileType = mime_content_type($file['tmp_name']);
+
+            if (in_array($fileType, $allowedTypes)) {
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = 'cafe_logo_' . time() . '.' . strtolower($ext);
+                
+                $uploadDirPublic = dirname(__DIR__, 2) . '/public/uploads/logo';
+                $uploadDirRoot = dirname(__DIR__, 2) . '/uploads/logo';
+                
+                if (!is_dir($uploadDirPublic)) {
+                    mkdir($uploadDirPublic, 0755, true);
+                }
+                if (!is_dir($uploadDirRoot)) {
+                    mkdir($uploadDirRoot, 0755, true);
+                }
+
+                $targetPublic = $uploadDirPublic . '/' . $filename;
+                $targetRoot = $uploadDirRoot . '/' . $filename;
+
+                if (move_uploaded_file($file['tmp_name'], $targetPublic)) {
+                    @copy($targetPublic, $targetRoot);
+                    $data['store_logo'] = BASE_URL . '/uploads/logo/' . $filename;
+                }
+            } else {
+                Session::setFlash('error', 'Format file logo tidak didukung. Harap gunakan JPG, PNG, WEBP, atau SVG.');
+            }
+        }
+
         if ($this->settingModel->updateMultiple($data)) {
             Session::setFlash('success', 'Pengaturan berhasil disimpan.');
         } else {

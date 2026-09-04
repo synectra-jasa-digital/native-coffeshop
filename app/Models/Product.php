@@ -58,8 +58,8 @@ class Product {
      */
     public function create($data) {
         $stmt = $this->db->prepare("
-            INSERT INTO products (category_id, name, description, base_price, is_active, is_out_of_stock) 
-            VALUES (:category_id, :name, :description, :base_price, :is_active, :is_out_of_stock)
+            INSERT INTO products (category_id, name, description, base_price, image_url, is_active, is_out_of_stock) 
+            VALUES (:category_id, :name, :description, :base_price, :image_url, :is_active, :is_out_of_stock)
         ");
         
         if ($stmt->execute([
@@ -67,6 +67,7 @@ class Product {
             ':name' => $data['name'],
             ':description' => $data['description'] ?? '',
             ':base_price' => $data['base_price'],
+            ':image_url' => $data['image_url'] ?? null,
             ':is_active' => $data['is_active'] ?? 1,
             ':is_out_of_stock' => $data['is_out_of_stock'] ?? 0
         ])) {
@@ -85,6 +86,7 @@ class Product {
                 name = :name, 
                 description = :description, 
                 base_price = :base_price, 
+                image_url = :image_url,
                 is_active = :is_active, 
                 is_out_of_stock = :is_out_of_stock 
             WHERE id = :id
@@ -96,6 +98,7 @@ class Product {
             ':name' => $data['name'],
             ':description' => $data['description'] ?? '',
             ':base_price' => $data['base_price'],
+            ':image_url' => $data['image_url'] ?? null,
             ':is_active' => $data['is_active'] ?? 1,
             ':is_out_of_stock' => $data['is_out_of_stock'] ?? 0
         ]);

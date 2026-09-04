@@ -23,7 +23,7 @@
                        id="starting_cash" 
                        name="starting_cash" 
                        min="0" 
-                       step="1000"
+                       step="1"
                        value="500000"
                        required
                        class="block w-full rounded-md shadow-sm text-lg font-bold transition-colors duration-200 focus:outline-none focus:ring-1 border-border text-textPrimary focus:border-primary focus:ring-primary border px-4 py-3">

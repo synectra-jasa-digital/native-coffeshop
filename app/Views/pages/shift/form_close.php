@@ -45,7 +45,7 @@
                        id="ending_cash" 
                        name="ending_cash" 
                        min="0" 
-                       step="1000"
+                       step="1"
                        value="<?= ($shift['starting_cash'] + ($summary['cash_amount'] ?? 0)) ?>"
                        required
                        oninput="calculateDifference(this.value)"

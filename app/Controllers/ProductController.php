@@ -79,11 +79,59 @@ class ProductController extends Controller {
             $this->redirect('products');
         }
 
+        $existingProduct = $id ? $this->productModel->getById($id) : null;
+        $imageUrl = $existingProduct ? $existingProduct['image_url'] : null;
+
+        // Handle image removal
+        if (isset($_POST['remove_image']) && $_POST['remove_image'] == '1') {
+            if ($imageUrl) {
+                $relativePath = parse_url($imageUrl, PHP_URL_PATH);
+                $filePathPublic = dirname(__DIR__, 2) . '/public' . $relativePath;
+                $filePathRoot = dirname(__DIR__, 2) . $relativePath;
+                if (file_exists($filePathPublic)) @unlink($filePathPublic);
+                if (file_exists($filePathRoot)) @unlink($filePathRoot);
+            }
+            $imageUrl = null;
+        }
+
+        // Handle file upload
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['image'];
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            $fileType = mime_content_type($file['tmp_name']);
+
+            if (in_array($fileType, $allowedTypes)) {
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = 'product_' . time() . '_' . uniqid() . '.' . strtolower($ext);
+
+                $uploadDirPublic = dirname(__DIR__, 2) . '/public/uploads/products';
+                $uploadDirRoot = dirname(__DIR__, 2) . '/uploads/products';
+
+                if (!is_dir($uploadDirPublic)) {
+                    mkdir($uploadDirPublic, 0755, true);
+                }
+                if (!is_dir($uploadDirRoot)) {
+                    mkdir($uploadDirRoot, 0755, true);
+                }
+
+                $targetPublic = $uploadDirPublic . '/' . $filename;
+                $targetRoot = $uploadDirRoot . '/' . $filename;
+
+                if (move_uploaded_file($file['tmp_name'], $targetPublic)) {
+                    @copy($targetPublic, $targetRoot);
+                    $imageUrl = BASE_URL . '/uploads/products/' . $filename;
+                }
+            } else {
+                Session::setFlash('error', 'Format gambar tidak didukung. Harap gunakan JPG, PNG, WEBP, atau GIF.');
+            }
+        }
+
         $data = [
             'category_id' => $_POST['category_id'] ?? null,
             'name' => trim($_POST['name'] ?? ''),
             'description' => trim($_POST['description'] ?? ''),
             'base_price' => str_replace(',', '', $_POST['base_price'] ?? 0),
+            'image_url' => $imageUrl,
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
             'is_out_of_stock' => isset($_POST['is_out_of_stock']) ? 1 : 0
         ];

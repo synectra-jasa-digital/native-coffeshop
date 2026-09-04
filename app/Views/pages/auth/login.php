@@ -1,9 +1,19 @@
 <div class="w-full max-w-md bg-surface p-8 rounded-lg shadow-md border border-border">
+    <?php
+    $loginLogo = (new \App\Models\Setting())->get('store_logo');
+    $loginStoreName = (new \App\Models\Setting())->get('store_name') ?? 'Good Coffee POS';
+    ?>
     <div class="text-center mb-8">
-        <div class="mx-auto h-12 w-12 bg-primary rounded-md flex items-center justify-center mb-4">
-            <span class="text-white font-bold text-2xl leading-none">G</span>
-        </div>
-        <h1 class="text-2xl font-bold text-textPrimary">Good Coffee POS</h1>
+        <?php if (!empty($loginLogo)): ?>
+            <div class="mx-auto h-16 w-16 mb-4 flex items-center justify-center">
+                <img src="<?= htmlspecialchars($loginLogo) ?>" alt="<?= htmlspecialchars($loginStoreName) ?>" class="max-h-full max-w-full object-contain">
+            </div>
+        <?php else: ?>
+            <div class="mx-auto h-12 w-12 bg-primary rounded-md flex items-center justify-center mb-4">
+                <span class="text-white font-bold text-2xl leading-none">G</span>
+            </div>
+        <?php endif; ?>
+        <h1 class="text-2xl font-bold text-textPrimary"><?= htmlspecialchars($loginStoreName) ?></h1>
         <p class="text-sm text-textSecondary mt-2">Silakan masuk untuk melanjutkan</p>
     </div>
 
@@ -47,6 +57,6 @@
     </form>
     
     <div class="mt-8 text-center text-xs text-textSecondary">
-        &copy; <?= date('Y') ?> Good Coffee. All rights reserved.
+        &copy; <?= date('Y') ?> <?= htmlspecialchars($loginStoreName) ?>. All rights reserved.
     </div>
 </div>

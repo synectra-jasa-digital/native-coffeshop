@@ -123,7 +123,9 @@ class Shift {
      */
     public function getAll($limit = 50) {
         $stmt = $this->db->prepare("
-            SELECT s.*, u.name as user_name 
+            SELECT s.*, u.name as user_name,
+                   (SELECT COUNT(t.id) FROM transactions t WHERE t.shift_id = s.id AND t.payment_status = 'success') as total_transactions,
+                   (SELECT COALESCE(SUM(t.total), 0) FROM transactions t WHERE t.shift_id = s.id AND t.payment_status = 'success') as total_amount
             FROM shifts s 
             JOIN users u ON s.user_id = u.id 
             ORDER BY s.start_time DESC 

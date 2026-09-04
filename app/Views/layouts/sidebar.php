@@ -28,6 +28,10 @@ function isActiveRoute($path, $uriPath) {
     style="display: none;"
 ></div>
 
+<?php
+$sidebarLogo = (new \App\Models\Setting())->get('store_logo');
+$sidebarStoreName = (new \App\Models\Setting())->get('store_name') ?? 'Good Coffee';
+?>
 <!-- Sidebar -->
 <aside 
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
@@ -35,11 +39,15 @@ function isActiveRoute($path, $uriPath) {
 >
     <!-- Logo/Brand -->
     <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-border">
-        <a href="<?= BASE_URL ?>" class="flex items-center gap-2">
-            <div class="h-8 w-8 bg-primary rounded-md flex items-center justify-center">
-                <span class="text-white font-bold text-lg leading-none">G</span>
-            </div>
-            <span class="text-lg font-bold text-textPrimary">Good Coffee</span>
+        <a href="<?= BASE_URL ?>" class="flex items-center gap-2.5">
+            <?php if (!empty($sidebarLogo)): ?>
+                <img src="<?= htmlspecialchars($sidebarLogo) ?>" alt="Logo" class="h-8 w-8 object-contain shrink-0">
+            <?php else: ?>
+                <div class="h-8 w-8 bg-primary rounded-md flex items-center justify-center shrink-0">
+                    <span class="text-white font-bold text-lg leading-none">G</span>
+                </div>
+            <?php endif; ?>
+            <span class="text-lg font-bold text-textPrimary truncate max-w-[170px]"><?= htmlspecialchars($sidebarStoreName) ?></span>
         </a>
         <button @click="sidebarOpen = false" class="lg:hidden text-textSecondary hover:text-primary">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

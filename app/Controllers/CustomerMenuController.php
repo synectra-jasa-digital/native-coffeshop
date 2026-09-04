@@ -24,13 +24,16 @@ class CustomerMenuController extends Controller {
         $table = $stmt->fetch();
 
         if (!$table) {
-            $this->view('pages/menu/invalid_qr', ['isAppLayout' => false]);
+            $this->view('pages/menu/invalid_qr', ['isAppLayout' => false], false);
             return;
         }
 
         // Ambil produk dan kategori (mirip POS Controller, hanya yang aktif dan tidak out_of_stock)
-        $categories = $this->categoryModel->getAllActive();
-        $products = $this->productModel->getAllActive();
+        $categories = $this->categoryModel->getAll(true); // active only
+        
+        $allProducts = $this->productModel->getAll(null, true); // active only
+        // Filter those not out_of_stock (optional logic depends on your schema, here just taking active)
+        $products = $allProducts;
         
         // Load varian (untuk mempermudah, karena kita tidak memakai ORM)
         $db = \App\Core\Database::getInstance()->getConnection();
@@ -50,13 +53,16 @@ class CustomerMenuController extends Controller {
             $menuData[$p['category_id']][] = $p;
         }
 
+        $storeInfo = (new \App\Models\Setting())->getStoreInfo();
+
         $this->view('pages/menu/index', [
-            'title' => 'Menu - Good Coffee',
+            'title' => 'Menu - ' . ($storeInfo['name'] ?? 'Good Coffee'),
             'isAppLayout' => false, // Persuade Mode (tidak pakai sidebar admin)
             'table' => $table,
             'categories' => $categories,
-            'menuData' => $menuData
-        ]);
+            'menuData' => $menuData,
+            'storeInfo' => $storeInfo
+        ], false);
     }
 
     public function submitOrder() {

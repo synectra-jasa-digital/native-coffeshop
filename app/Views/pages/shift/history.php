@@ -40,8 +40,9 @@
                             <?= $shift['end_time'] ? date('d/m/Y H:i', strtotime($shift['end_time'])) : '-' ?>
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">Rp <?= number_format($shift['starting_cash'], 0, ',', '.') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600">
-                            <!-- Could add summary here -->
+                        <td class="px-4 py-3 text-sm">
+                            <div class="font-semibold text-gray-900">Rp <?= number_format($shift['total_amount'] ?? 0, 0, ',', '.') ?></div>
+                            <div class="text-xs text-gray-500 font-normal"><?= number_format($shift['total_transactions'] ?? 0) ?> transaksi</div>
                         </td>
                         <td class="px-4 py-3">
                             <?php if ($shift['status'] === 'open'): ?>
