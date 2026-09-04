@@ -21,8 +21,10 @@ try {
         ['Pastry & Bakery', 4]
     ];
     
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
     $pdo->exec("DELETE FROM categories"); // Clean up
     $pdo->exec("ALTER TABLE categories AUTO_INCREMENT = 1");
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
     
     $stmt = $pdo->prepare("INSERT INTO categories (name, sort_order, is_active) VALUES (?, ?, 1)");
     foreach ($categories as $cat) {
@@ -108,10 +110,23 @@ try {
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
     $stmt = $pdo->prepare("INSERT INTO ingredients (name, unit, min_stock, current_stock) VALUES (?, ?, ?, ?)");
+    
+    // Prepare for initial stock movement
+    $pdo->exec("DELETE FROM stock_movements");
+    $pdo->exec("ALTER TABLE stock_movements AUTO_INCREMENT = 1");
+    $movementStmt = $pdo->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, notes) VALUES (?, 1, 'in', ?, 'Initial Stock from Seeder')");
+
+    $ingredientId = 1;
     foreach ($ingredients as $i) {
         $stmt->execute($i);
+        
+        // Log initial stock movement (simulating Admin ID 1)
+        if ($i[3] > 0) { // If current_stock > 0
+            $movementStmt->execute([$ingredientId, $i[3]]);
+        }
+        $ingredientId++;
     }
-    echo "   - Created " . count($ingredients) . " ingredients.\n";
+    echo "   - Created " . count($ingredients) . " ingredients and their initial stock movements.\n";
 
     // --- 5. SEED RECIPES (Optional/Basic) ---
     echo "5. Seeding Basic Recipes...\n";

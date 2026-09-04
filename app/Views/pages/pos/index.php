@@ -266,7 +266,7 @@
                             <option value="">-- Pilih Meja --</option>
                             <?php if (isset($tables) && !empty($tables)): ?>
                                 <?php foreach($tables as $t): ?>
-                                    <option value="<?= $t['id'] ?>">Meja <?= htmlspecialchars($t['table_number']) ?></option>
+                                    <option value="<?= $t['id'] ?>">Meja <?= htmlspecialchars($t['table_number']) ?> <?= isset($t['status']) && $t['status'] === 'occupied' ? '(Terisi)' : '' ?></option>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <option value="" disabled>Semua meja penuh / tidak ada data</option>
@@ -505,28 +505,48 @@ document.addEventListener('alpine:init', () => {
                 }))
             };
 
+            // Ensure base_url formatting is solid without trailing slash
+            let apiEndpoint = BASE_URL.replace(/\/$/, '') + '/pos/checkout';
+            
             try {
-                const response = await fetch(BASE_URL + '/pos/checkout', {
+                const response = await fetch(apiEndpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify(payload)
                 });
 
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+
                 const data = await response.json();
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                         window.location.href = BASE_URL + '/login';
+                         return;
+                    }
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                }
 
                 if (data.success) {
                     this.showPaymentModal = false;
                     this.cart = [];
-                    // Optionally show receipt or redirect
-                    showDialog('success', 'Transaksi Berhasil', 'Pesanan telah dicatat.', false);
+                    // Gunakan custom dialog dengan style tailwind
+                    showDialog('success', 'Transaksi Berhasil', 'Pesanan telah dicatat.', true, () => {
+                        window.open(BASE_URL + '/pos/print/' + data.order_id, '_blank', 'width=400,height=600');
+                    });
                 } else {
                     showDialog('error', 'Transaksi Gagal', data.message || 'Terjadi kesalahan sistem.');
                 }
             } catch (error) {
-                showDialog('error', 'Error', 'Gagal terhubung ke server.');
+                console.error("Checkout Error:", error);
+                showDialog('error', 'Error', error.message || 'Gagal terhubung ke server.');
             } finally {
                 this.isProcessing = false;
             }

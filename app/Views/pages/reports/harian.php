@@ -15,12 +15,36 @@
 
     <!-- Date Picker -->
     <div class="bg-white rounded-lg border border-gray-200 p-4 flex items-end gap-4">
-        <form method="GET">
+        <form method="GET" class="flex flex-wrap gap-4 items-end" x-data="{ reportType: '<?= isset($_GET['type']) ? $_GET['type'] : 'daily' ?>' }">
             <div>
-                <label class="block text-xs text-gray-500 mb-1">Pilih Tanggal</label>
-                <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Laporan</label>
+                <select name="type" x-model="reportType" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
+                    <option value="daily" <?= (isset($_GET['type']) && $_GET['type'] == 'daily' || !isset($_GET['type'])) ? 'selected' : '' ?>>Harian</option>
+                    <option value="monthly" <?= (isset($_GET['type']) && $_GET['type'] == 'monthly') ? 'selected' : '' ?>>Bulanan</option>
+                    <option value="yearly" <?= (isset($_GET['type']) && $_GET['type'] == 'yearly') ? 'selected' : '' ?>>Tahunan</option>
+                </select>
             </div>
-            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-md text-sm font-medium hover:bg-gray-700 transition">Tampilkan</button>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Tanggal</label>
+                <!-- Input Tanggal Harian -->
+                <input x-show="reportType === 'daily'" type="date" name="date_daily" value="<?= htmlspecialchars($_GET['date_daily'] ?? date('Y-m-d')) ?>" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
+                
+                <!-- Input Tanggal Bulanan -->
+                <input x-show="reportType === 'monthly'" type="month" name="date_monthly" value="<?= htmlspecialchars($_GET['date_monthly'] ?? date('Y-m')) ?>" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
+                
+                <!-- Input Tanggal Tahunan (Pakai number input tahun) -->
+                <input x-show="reportType === 'yearly'" type="number" min="2020" max="2100" name="date_yearly" value="<?= htmlspecialchars($_GET['date_yearly'] ?? date('Y')) ?>" placeholder="YYYY" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-28">
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="px-5 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    Tampilkan
+                </button>
+                <button type="submit" name="export" value="pdf" class="px-5 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Ekspor PDF
+                </button>
+            </div>
         </form>
     </div>
 

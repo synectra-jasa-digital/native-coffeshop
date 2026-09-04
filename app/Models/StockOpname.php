@@ -37,14 +37,41 @@ class StockOpname {
      * Create a new stock opname record
      */
     public function create($data) {
-        $stmt = $this->db->prepare("INSERT INTO stock_opnames (ingredient_id, user_id, expected_qty, actual_qty, difference, status) VALUES (?, ?, ?, ?, ?, 'pending')");
-        return $stmt->execute([
-            $data['ingredient_id'],
-            $data['user_id'],
-            $data['expected_qty'],
-            $data['actual_qty'],
-            $data['difference']
-        ]);
+        $this->db->beginTransaction();
+
+        try {
+            // 1. Insert opname record as 'approved' automatically
+            $stmt = $this->db->prepare("INSERT INTO stock_opnames (ingredient_id, user_id, expected_qty, actual_qty, difference, status) VALUES (?, ?, ?, ?, ?, 'approved')");
+            $stmt->execute([
+                $data['ingredient_id'],
+                $data['user_id'],
+                $data['expected_qty'],
+                $data['actual_qty'],
+                $data['difference']
+            ]);
+            
+            $opnameId = $this->db->lastInsertId();
+
+            // 2. Update actual ingredient stock to match actual_qty automatically
+            $updateStock = $this->db->prepare("UPDATE ingredients SET current_stock = ? WHERE id = ?");
+            $updateStock->execute([$data['actual_qty'], $data['ingredient_id']]);
+
+            // 3. Automatically insert movement log (adjustment)
+            $moveStmt = $this->db->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, reference_id, notes) VALUES (?, ?, 'adjustment', ?, ?, 'Otomatis: Stock Opname Update')");
+            $moveStmt->execute([
+                $data['ingredient_id'],
+                $data['user_id'],
+                $data['difference'],
+                $opnameId
+            ]);
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            error_log('Stock Opname error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**

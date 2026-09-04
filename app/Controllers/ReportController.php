@@ -38,11 +38,29 @@ class ReportController extends Controller {
      * Laporan Penjualan Harian
      */
     public function harian() {
-        $date = $_GET['date'] ?? date('Y-m-d');
-        $summary = $this->transactionModel->getDailySummary($date);
+        $type = $_GET['type'] ?? 'daily';
+        
+        if ($type === 'monthly') {
+            $date = $_GET['date_monthly'] ?? date('Y-m');
+            $dateFrom = date('Y-m-01', strtotime($date));
+            $dateTo = date('Y-m-t', strtotime($date));
+            $titlePrefix = "Bulanan (" . date('F Y', strtotime($date)) . ")";
+        } else if ($type === 'yearly') {
+            $date = $_GET['date_yearly'] ?? date('Y');
+            $dateFrom = date('Y-01-01', strtotime($date . '-01-01'));
+            $dateTo = date('Y-12-31', strtotime($date . '-12-31'));
+            $titlePrefix = "Tahunan (" . $date . ")";
+        } else {
+            $date = $_GET['date_daily'] ?? date('Y-m-d');
+            $dateFrom = $date;
+            $dateTo = $date;
+            $titlePrefix = "Harian";
+        }
 
-        // Get transactions for the day
-        $transactions = $this->transactionModel->getAll(['date_from' => $date, 'date_to' => $date], 1000);
+        $summary = $this->transactionModel->getDailySummary($dateFrom, $dateTo);
+
+        // Get transactions
+        $transactions = $this->transactionModel->getAll(['date_from' => $dateFrom, 'date_to' => $dateTo], 10000);
 
         // Group by payment method
         $paymentMethods = [
@@ -61,9 +79,18 @@ class ReportController extends Controller {
             }
         }
 
+        $title = 'Laporan Penjualan ' . $titlePrefix;
+
+        if (isset($_GET['export']) && $_GET['export'] == 'pdf') {
+            require_once __DIR__ . '/../Views/pages/reports/print_harian.php';
+            return;
+        }
+
         $this->view('pages/reports/harian', [
-            'title' => 'Laporan Penjualan Harian',
-            'date' => $date,
+            'title' => $title,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'type' => $type,
             'summary' => $summary,
             'transactions' => $transactions,
             'paymentMethods' => $paymentMethods

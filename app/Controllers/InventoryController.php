@@ -325,7 +325,7 @@ class InventoryController extends Controller {
         ];
 
         if ($this->stockOpnameModel->create($data)) {
-            Session::setFlash('success', 'Laporan stock opname berhasil disubmit dan menunggu persetujuan.');
+            Session::setFlash('success', 'Laporan stock opname berhasil disubmit dan stok diperbarui secara otomatis.');
             $this->redirect('inventory/opname');
         } else {
             Session::setFlash('error', 'Gagal mensubmit stock opname.');

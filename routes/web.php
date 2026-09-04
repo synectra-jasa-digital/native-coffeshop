@@ -67,6 +67,7 @@ $router->post('/inventory/opname/status/:id', 'InventoryController', 'updateOpna
 // Protected Routes - POS
 $router->get('/pos', 'PosController', 'index');
 $router->post('/pos/checkout', 'PosController', 'checkout');
+$router->get('/pos/print/(\d+)', 'PosController', 'printReceipt');
 
 // Protected Routes - Shift
 $router->get('/shift/open', 'ShiftController', 'formOpen');
@@ -108,6 +109,12 @@ $router->get('/api/notifications/new-orders', 'NotificationController', 'checkNe
 $router->get('/laporan/penjualan-harian', 'ReportController', 'harian');
 $router->get('/laporan/stok', 'ReportController', 'stok');
 $router->get('/laporan/kasir-shift', 'ReportController', 'kasir_shift');
+
+// Protected Routes - Reports
+$router->get('/reports', 'ReportController', 'harian');
+$router->get('/reports/harian', 'ReportController', 'harian');
+$router->get('/reports/stok', 'ReportController', 'stok');
+$router->get('/reports/kasir-shift', 'ReportController', 'kasir_shift');
 
 // Protected Routes - Users (Modul G)
 $router->get('/users', 'UserController', 'index');

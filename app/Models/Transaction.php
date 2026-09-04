@@ -130,10 +130,9 @@ class Transaction {
     /**
      * Get daily sales summary
      */
-    public function getDailySummary($date = null) {
-        if (!$date) {
-            $date = date('Y-m-d');
-        }
+    public function getDailySummary($dateFrom = null, $dateTo = null) {
+        if (!$dateFrom) $dateFrom = date('Y-m-d');
+        if (!$dateTo) $dateTo = $dateFrom;
 
         $stmt = $this->db->prepare("
             SELECT 
@@ -142,10 +141,10 @@ class Transaction {
                 COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN total ELSE 0 END), 0) as cash_total,
                 COALESCE(SUM(CASE WHEN payment_method != 'cash' THEN total ELSE 0 END), 0) as non_cash_total
             FROM transactions
-            WHERE DATE(created_at) = :date AND payment_status = 'success'
+            WHERE DATE(created_at) >= :dateFrom AND DATE(created_at) <= :dateTo AND payment_status = 'success'
         ");
-        $stmt->execute([':date' => $date]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute([':dateFrom' => $dateFrom, ':dateTo' => $dateTo]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
