@@ -50,6 +50,7 @@ function isActiveRoute($path, $uriPath) {
 
     <!-- Navigation Menu -->
     <nav class="flex-1 overflow-y-auto no-scrollbar px-3 py-4 space-y-1">
+        <?php $userRole = \App\Core\Session::get('user_role_name'); ?>
         
         <p class="px-3 text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 mt-4">Menu Utama</p>
         
@@ -67,6 +68,26 @@ function isActiveRoute($path, $uriPath) {
             </svg>
             Point of Sale
         </a>
+
+        <!-- Shift Kasir -->
+        <div x-data="{ expanded: <?= (strpos($uriPath, '/shift') === 0) ? 'true' : 'false' ?> }">
+            <button @click="expanded = !expanded" class="w-full flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-textPrimary hover:bg-background transition-colors">
+                <div class="flex items-center">
+                    <svg class="<?= (strpos($uriPath, '/shift') === 0) ? 'text-primary' : 'text-textSecondary' ?> mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Shift Kasir
+                </div>
+                <svg :class="{'rotate-180': expanded}" class="h-4 w-4 transform transition-transform text-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div x-show="expanded" class="mt-1 pl-11 space-y-1" x-collapse>
+                <a href="<?= BASE_URL ?>/shift/open" class="<?= isActiveRoute('/shift/open', $uriPath) ? 'text-primary font-semibold' : 'text-textSecondary hover:text-textPrimary' ?> block py-2 text-sm transition-colors">Buka Shift</a>
+                <a href="<?= BASE_URL ?>/shift/close" class="<?= isActiveRoute('/shift/close', $uriPath) ? 'text-primary font-semibold' : 'text-textSecondary hover:text-textPrimary' ?> block py-2 text-sm transition-colors">Tutup Shift</a>
+                <a href="<?= BASE_URL ?>/shift/history" class="<?= isActiveRoute('/shift/history', $uriPath) ? 'text-primary font-semibold' : 'text-textSecondary hover:text-textPrimary' ?> block py-2 text-sm transition-colors">Riwayat Shift</a>
+            </div>
+        </div>
 
         <!-- Manajemen Meja -->
         <a href="<?= BASE_URL ?>/tables" class="<?= isActiveRoute('/tables', $uriPath) ? 'bg-primary/10 text-primary' : 'text-textPrimary hover:bg-background' ?> group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors">
@@ -116,7 +137,8 @@ function isActiveRoute($path, $uriPath) {
         </a>
 
         <p class="px-3 text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 mt-6">Laporan & Sistem</p>
-
+        
+        <?php if (in_array($userRole, ['Admin', 'Manager', 'Kasir'])): ?>
         <!-- Laporan -->
         <a href="<?= BASE_URL ?>/reports" class="<?= isActiveRoute('/reports', $uriPath) ? 'bg-primary/10 text-primary' : 'text-textPrimary hover:bg-background' ?> group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors">
             <svg class="<?= isActiveRoute('/reports', $uriPath) ? 'text-primary' : 'text-textSecondary group-hover:text-primary' ?> mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,13 +146,23 @@ function isActiveRoute($path, $uriPath) {
             </svg>
             Laporan
         </a>
+        <?php endif; ?>
 
+        <?php if ($userRole === 'Admin'): ?>
         <!-- Pengguna -->
         <a href="<?= BASE_URL ?>/users" class="<?= isActiveRoute('/users', $uriPath) ? 'bg-primary/10 text-primary' : 'text-textPrimary hover:bg-background' ?> group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors">
             <svg class="<?= isActiveRoute('/users', $uriPath) ? 'text-primary' : 'text-textSecondary group-hover:text-primary' ?> mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             Pengguna
+        </a>
+        
+        <!-- Log Aktivitas -->
+        <a href="<?= BASE_URL ?>/activity-logs" class="<?= isActiveRoute('/activity-logs', $uriPath) ? 'bg-primary/10 text-primary' : 'text-textPrimary hover:bg-background' ?> group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors">
+            <svg class="<?= isActiveRoute('/activity-logs', $uriPath) ? 'text-primary' : 'text-textSecondary group-hover:text-primary' ?> mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Log Aktivitas
         </a>
 
         <!-- Pengaturan -->
@@ -141,5 +173,6 @@ function isActiveRoute($path, $uriPath) {
             </svg>
             Pengaturan
         </a>
+        <?php endif; ?>
     </nav>
 </aside>
