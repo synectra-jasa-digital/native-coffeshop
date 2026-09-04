@@ -1,7 +1,7 @@
 <!-- Form Pengguna -->
-<div class="flex flex-col h-full w-full">
+<div class="w-full space-y-6">
     <!-- Page Header -->
-    <div class="flex items-center gap-3 mb-6">
+    <div class="flex items-center gap-3">
         <a href="<?= BASE_URL ?>/users" class="text-textSecondary hover:text-primary transition-colors bg-surface p-2 rounded-md border border-border shadow-sm">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -9,15 +9,15 @@
         </a>
         <div>
             <h1 class="text-2xl font-bold text-textPrimary"><?= htmlspecialchars($title) ?></h1>
-            <p class="text-sm text-textSecondary mt-1">Kelola data pengguna dan perannya di dalam sistem.</p>
+            <p class="text-sm text-textSecondary mt-0.5">Kelola data pengguna dan perannya di dalam sistem.</p>
         </div>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-surface rounded-lg border border-border shadow-sm p-6 flex-1">
-        <form method="POST" action="<?= BASE_URL ?>/users/save<?= $user ? '/' . $user['id'] : '' ?>" class="space-y-6 w-full">
+    <div class="bg-surface rounded-lg border border-border shadow-sm p-6">
+        <form method="POST" action="<?= BASE_URL ?>/users/save<?= $user ? '/' . $user['id'] : '' ?>" class="space-y-5 w-full">
             
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <!-- Nama Lengkap -->
                 <div class="col-span-2 sm:col-span-1">
                     <label for="name" class="block text-sm font-medium text-textSecondary mb-1">Nama Lengkap <span class="text-danger">*</span></label>
@@ -60,8 +60,8 @@
                 </div>
             </div>
 
-            <div class="border-t border-border pt-6">
-                <h3 class="text-base font-bold text-textPrimary mb-4">Keamanan</h3>
+            <div class="border-t border-border pt-5">
+                <h3 class="text-base font-bold text-textPrimary mb-3">Keamanan</h3>
                 
                 <!-- Password -->
                 <div>
@@ -74,7 +74,7 @@
             </div>
 
             <!-- Buttons -->
-            <div class="border-t border-border pt-6 flex items-center justify-end gap-3">
+            <div class="border-t border-border pt-4 flex items-center justify-end gap-3">
                 <a href="<?= BASE_URL ?>/users" class="inline-flex items-center justify-center font-medium rounded-md px-4 py-2 text-sm bg-surface text-textPrimary hover:bg-background border border-border focus:ring-border shadow-sm cursor-pointer transition-colors duration-200">
                     Batal
                 </a>

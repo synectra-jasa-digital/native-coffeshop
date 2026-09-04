@@ -1,14 +1,14 @@
-<div class="flex flex-col h-full">
+<div class="w-full mb-6">
     <!-- Page Header -->
-    <div class="flex items-center gap-3 mb-6">
-        <a href="<?= BASE_URL ?>" class="text-textSecondary hover:text-primary transition-colors bg-surface p-2 rounded-md border border-border shadow-sm">
+    <div class="flex items-center gap-3">
+        <a href="<?= BASE_URL ?>/products" class="text-textSecondary hover:text-primary transition-colors bg-surface p-2 rounded-md border border-border shadow-sm">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
         </a>
         <div>
             <h1 class="text-2xl font-bold text-textPrimary"><?= htmlspecialchars($title) ?></h1>
-            <p class="text-sm text-textSecondary mt-1">Kelola informasi produk dan varian yang dijual.</p>
+            <p class="text-sm text-textSecondary mt-0.5">Kelola informasi produk dan varian yang dijual.</p>
         </div>
     </div>
 </div>

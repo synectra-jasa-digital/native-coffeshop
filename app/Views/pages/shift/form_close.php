@@ -1,7 +1,7 @@
 <!-- Tutup Shift Form -->
-<div class="flex flex-col h-full w-full">
+<div class="w-full space-y-6">
     <!-- Page Header -->
-    <div class="flex items-center gap-3 mb-6">
+    <div class="flex items-center gap-3">
         <a href="<?= BASE_URL ?>/pos" class="text-textSecondary hover:text-primary transition-colors bg-surface p-2 rounded-md border border-border shadow-sm">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -9,14 +9,14 @@
         </a>
         <div>
             <h1 class="text-2xl font-bold text-textPrimary"><?= htmlspecialchars($title) ?></h1>
-            <p class="text-sm text-textSecondary mt-1">Hitung kas fisik akhir untuk rekonsiliasi penutupan shift.</p>
+            <p class="text-sm text-textSecondary mt-0.5">Hitung kas fisik akhir untuk rekonsiliasi penutupan shift.</p>
         </div>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-surface rounded-lg border border-border shadow-sm p-6 flex-1">
+    <div class="bg-surface rounded-lg border border-border shadow-sm p-6">
         <!-- Ringkasan Shift -->
-        <div class="bg-background rounded-md p-4 mb-6 space-y-2 border border-border">
+        <div class="bg-background rounded-md p-4 mb-5 space-y-2 border border-border">
             <div class="flex justify-between text-sm">
                 <span class="text-textSecondary">Modal Awal</span>
                 <span class="font-medium text-textPrimary">Rp <?= number_format($shift['starting_cash'], 0, ',', '.') ?></span>
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Form -->
-        <form method="POST" action="<?= BASE_URL ?>/shift/close" class="space-y-6 w-full">
+        <form method="POST" action="<?= BASE_URL ?>/shift/close" class="space-y-5 w-full">
             <!-- Kas Fisik Akhir -->
             <div>
                 <label for="ending_cash" class="block text-sm font-medium text-textSecondary mb-1">Kas Fisik Akhir (Rp) <span class="text-danger">*</span></label>
@@ -63,7 +63,7 @@
             </div>
 
             <!-- Buttons -->
-            <div class="border-t border-border pt-6 flex items-center justify-end gap-3">
+            <div class="border-t border-border pt-4 flex items-center justify-end gap-3">
                 <a href="<?= BASE_URL ?>/pos" class="inline-flex items-center justify-center font-medium rounded-md px-4 py-2 text-sm bg-surface text-textPrimary hover:bg-background border border-border focus:ring-border shadow-sm cursor-pointer transition-colors duration-200">
                     Kembali
                 </a>
