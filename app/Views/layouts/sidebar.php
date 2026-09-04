@@ -68,6 +68,14 @@ function isActiveRoute($path, $uriPath) {
             Point of Sale
         </a>
 
+        <!-- Manajemen Meja -->
+        <a href="<?= BASE_URL ?>/tables" class="<?= isActiveRoute('/tables', $uriPath) ? 'bg-primary/10 text-primary' : 'text-textPrimary hover:bg-background' ?> group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors">
+            <svg class="<?= isActiveRoute('/tables', $uriPath) ? 'text-primary' : 'text-textSecondary group-hover:text-primary' ?> mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            Manajemen Meja
+        </a>
+
         <p class="px-3 text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 mt-6">Operasional</p>
         
         <!-- Produk -->

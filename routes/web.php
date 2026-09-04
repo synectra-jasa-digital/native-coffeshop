@@ -84,6 +84,26 @@ $router->post('/transactions/:id/void', 'TransactionController', 'void');
 $router->get('/settings', 'SettingController', 'index');
 $router->post('/settings/save', 'SettingController', 'save');
 
+// Customer Menu (Public)
+$router->get('/menu/:id', 'CustomerMenuController', 'index');
+$router->post('/menu/submit', 'CustomerMenuController', 'submitOrder');
+
+// Kitchen Display System (KDS)
+$router->get('/kds', 'KdsController', 'index');
+$router->post('/kds/status/:id', 'KdsController', 'updateStatus');
+
+// Table Management
+$router->get('/tables', 'TableController', 'index');
+$router->get('/tables/create', 'TableController', 'form');
+$router->post('/tables/save', 'TableController', 'save');
+$router->get('/tables/edit/:id', 'TableController', 'form');
+$router->post('/tables/save/:id', 'TableController', 'save');
+$router->post('/tables/regenerate/:id', 'TableController', 'regenerateQR');
+$router->post('/tables/delete/:id', 'TableController', 'delete');
+
+// Real-time Notifications Polling
+$router->get('/api/notifications/new-orders', 'NotificationController', 'checkNewOrders');
+        
 // Protected Routes - Reports (Modul F)
 $router->get('/laporan/penjualan-harian', 'ReportController', 'harian');
 $router->get('/laporan/stok', 'ReportController', 'stok');

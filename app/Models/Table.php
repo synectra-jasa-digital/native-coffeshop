@@ -11,53 +11,66 @@ class Table {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    /**
-     * Get all tables
-     */
     public function getAll() {
-        $stmt = $this->db->query("SELECT * FROM tables ORDER BY table_number ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->db->query("SELECT * FROM tables ORDER BY CAST(table_number AS UNSIGNED), table_number ASC");
+        return $stmt->fetchAll();
     }
 
-    /**
-     * Get available (empty) tables
-     */
-    public function getAvailable() {
-        $stmt = $this->db->query("SELECT * FROM tables WHERE status = 'empty' ORDER BY table_number ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Get table by ID
-     */
     public function getById($id) {
-        $stmt = $this->db->prepare("SELECT * FROM tables WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->db->prepare("SELECT * FROM tables WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
     }
 
-    /**
-     * Create a new table
-     */
-    public function create($tableNumber) {
-        $stmt = $this->db->prepare("INSERT INTO tables (table_number, status) VALUES (:number, 'empty')");
-        $stmt->execute([':number' => $tableNumber]);
-        return $this->db->lastInsertId();
+    public function getByNumber($number) {
+        $stmt = $this->db->prepare("SELECT * FROM tables WHERE table_number = ?");
+        $stmt->execute([$number]);
+        return $stmt->fetch();
     }
 
-    /**
-     * Update table status
-     */
+    public function create($data) {
+        // Generate unique token for QR code
+        $token = bin2hex(random_bytes(16));
+        
+        $stmt = $this->db->prepare("INSERT INTO tables (table_number, qr_code, status) VALUES (?, ?, ?)");
+        return $stmt->execute([
+            $data['table_number'],
+            $token, // We save a token, the full URL will be generated in the view
+            $data['status'] ?? 'empty'
+        ]);
+    }
+
+    public function update($id, $data) {
+        $stmt = $this->db->prepare("UPDATE tables SET table_number = ?, status = ? WHERE id = ?");
+        return $stmt->execute([
+            $data['table_number'],
+            $data['status'],
+            $id
+        ]);
+    }
+
     public function updateStatus($id, $status) {
-        $stmt = $this->db->prepare("UPDATE tables SET status = :status WHERE id = :id");
-        return $stmt->execute([':status' => $status, ':id' => $id]);
+        $stmt = $this->db->prepare("UPDATE tables SET status = ? WHERE id = ?");
+        return $stmt->execute([$status, $id]);
     }
 
-    /**
-     * Delete a table
-     */
+    public function regenerateQR($id) {
+        $token = bin2hex(random_bytes(16));
+        $stmt = $this->db->prepare("UPDATE tables SET qr_code = ? WHERE id = ?");
+        return $stmt->execute([$token, $id]);
+    }
+
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM tables WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        // Check if table has active transactions (can't delete if occupied)
+        $stmt = $this->db->prepare("SELECT status FROM tables WHERE id = ?");
+        $stmt->execute([$id]);
+        $table = $stmt->fetch();
+        
+        if ($table && $table['status'] === 'occupied') {
+            return false;
+        }
+
+        $stmt = $this->db->prepare("DELETE FROM tables WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 }

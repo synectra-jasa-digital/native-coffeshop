@@ -36,6 +36,13 @@ class Order {
             // Prepare query for stock deduction
             $stockStmt = $this->db->prepare("UPDATE ingredients SET current_stock = current_stock - ? WHERE id = ?");
 
+            // Prepare query for stock movement log
+            $movementStmt = $this->db->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, notes) VALUES (?, ?, 'out', ?, ?)");
+
+            // Get user_id safely (fallback to 1 if testing without session)
+            $userId = \App\Core\Session::get('user_id');
+            if (!$userId) $userId = 1;
+
             foreach ($items as $item) {
                 // Insert Item
                 $itemStmt->execute([
@@ -49,12 +56,18 @@ class Order {
 
                 // Get Recipe for this item
                 $recipeStmt->execute([$item['product_id'], $item['variant_id'] ?? null]);
-                $recipes = $recipeStmt->fetchAll(PDO::FETCH_ASSOC);
+                $recipes = $recipeStmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 // Deduct stock for each ingredient in the recipe
                 foreach ($recipes as $recipe) {
                     $totalDeduction = $recipe['quantity'] * $item['quantity'];
+                    
+                    // 1. Update total stock
                     $stockStmt->execute([$totalDeduction, $recipe['ingredient_id']]);
+                    
+                    // 2. Log to stock movements
+                    $movementNotes = "Terjual: Order #" . $orderId;
+                    $movementStmt->execute([$recipe['ingredient_id'], $userId, $totalDeduction, $movementNotes]);
                 }
             }
 
@@ -62,20 +75,29 @@ class Order {
             $transStmt = $this->db->prepare("INSERT INTO transactions (order_id, shift_id, subtotal, tax, service_charge, discount, total, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'success')");
             $transStmt->execute([
                 $orderId,
-                $transactionData['shift_id'], // Needs active shift logic
+                $transactionData['shift_id'],
                 $transactionData['subtotal'],
                 $transactionData['tax'],
-                $transactionData['service_charge'],
-                $transactionData['discount'],
+                $transactionData['service_charge'] ?? 0,
+                $transactionData['discount'] ?? 0,
                 $transactionData['total'],
                 $transactionData['payment_method']
             ]);
+
+            // Optional: Jika ini pesanan Dine-In, ubah status meja jadi occupied 
+            // (Walaupun POS langsung dianggap completed, mungkin ada baiknya meja tetap ditandai 'occupied' 
+            // sampai pelanggan pergi. Jika mau meja lgsg kosong bisa dikomen baris di bwh ini)
+            if (!empty($orderData['table_id'])) {
+                $tableStmt = $this->db->prepare("UPDATE tables SET status = 'occupied' WHERE id = ?");
+                $tableStmt->execute([$orderData['table_id']]);
+            }
 
             $this->db->commit();
             return $orderId;
 
         } catch (\Exception $e) {
             $this->db->rollBack();
+            error_log('Order creation error: ' . $e->getMessage());
             return false;
         }
     }

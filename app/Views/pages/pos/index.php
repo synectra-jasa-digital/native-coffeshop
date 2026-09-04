@@ -113,10 +113,25 @@
             </div>
         </div>
 
-        <!-- Order Type Selector -->
-        <div class="p-3 border-b border-gray-100 flex gap-2 bg-gray-50 flex-shrink-0">
-            <button @click="orderType = 'dine_in'" :class="orderType === 'dine_in' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-600 border border-border hover:bg-gray-50'" class="flex-1 py-1.5 rounded text-sm font-medium transition-colors">Dine In</button>
-            <button @click="orderType = 'take_away'" :class="orderType === 'take_away' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-600 border border-border hover:bg-gray-50'" class="flex-1 py-1.5 rounded text-sm font-medium transition-colors">Take Away</button>
+        <!-- Order Type Selector & Table Selection -->
+        <div class="p-3 border-b border-gray-100 flex flex-col gap-2 bg-gray-50 flex-shrink-0">
+            <div class="flex gap-2">
+                <button @click="orderType = 'dine_in'; selectedTable = ''" :class="orderType === 'dine_in' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-600 border border-border hover:bg-gray-50'" class="flex-1 py-1.5 rounded text-sm font-medium transition-colors">Dine In</button>
+                <button @click="orderType = 'take_away'; selectedTable = ''" :class="orderType === 'take_away' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-600 border border-border hover:bg-gray-50'" class="flex-1 py-1.5 rounded text-sm font-medium transition-colors">Take Away</button>
+            </div>
+            
+            <div x-show="orderType === 'dine_in'" x-collapse>
+                <select x-model="selectedTable" class="w-full text-sm border-border rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 transition-colors py-1.5 px-3">
+                    <option value="">-- Pilih Meja --</option>
+                    <?php if (isset($tables) && !empty($tables)): ?>
+                        <?php foreach($tables as $t): ?>
+                            <option value="<?= $t['id'] ?>">Meja <?= htmlspecialchars($t['table_number']) ?></option>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <option value="" disabled>Semua meja penuh</option>
+                    <?php endif; ?>
+                </select>
+            </div>
         </div>
 
         <!-- Cart Items List -->
@@ -243,6 +258,23 @@
                 </div>
                 
                 <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                    
+                    <!-- Table Selection for Dine In -->
+                    <div x-show="orderType === 'dine_in'" x-collapse>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Meja <span class="text-danger">*</span></label>
+                        <select x-model="selectedTable" class="w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 transition-colors">
+                            <option value="">-- Pilih Meja --</option>
+                            <?php if (isset($tables) && !empty($tables)): ?>
+                                <?php foreach($tables as $t): ?>
+                                    <option value="<?= $t['id'] ?>">Meja <?= htmlspecialchars($t['table_number']) ?></option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>Semua meja penuh / tidak ada data</option>
+                            <?php endif; ?>
+                        </select>
+                        <p class="text-xs text-red-500 mt-1" x-show="orderType === 'dine_in' && !selectedTable">Wajib memilih meja untuk Dine In</p>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran</label>
                         <div class="grid grid-cols-2 gap-2">
@@ -280,7 +312,7 @@
                         Batal
                     </button>
                     <button @click="processCheckout()" 
-                            :disabled="isProcessing || (paymentMethod === 'cash' && cashReceived < totals.grandTotal)" 
+                            :disabled="isProcessing || (paymentMethod === 'cash' && cashReceived < totals.grandTotal) || (orderType === 'dine_in' && !selectedTable)" 
                             class="flex-1 py-3 bg-primary text-white font-bold rounded-lg shadow-sm hover:bg-primary-hover disabled:opacity-50 flex items-center justify-center">
                         <svg x-show="isProcessing" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         <span x-text="isProcessing ? 'Memproses...' : 'Selesai'"></span>
@@ -303,6 +335,7 @@ document.addEventListener('alpine:init', () => {
         selectedCategory: 'all',
         cart: [],
         orderType: 'dine_in',
+        selectedTable: '',
         showCartOnMobile: false,
         
         // Modals
@@ -457,6 +490,7 @@ document.addEventListener('alpine:init', () => {
 
             const payload = {
                 order_type: this.orderType,
+                table_id: this.orderType === 'dine_in' ? this.selectedTable : null,
                 payment_method: this.paymentMethod,
                 subtotal: this.totals.subtotal,
                 tax_amount: this.totals.tax,

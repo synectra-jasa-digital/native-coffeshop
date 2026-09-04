@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Session;
+use App\Core\Database;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
@@ -66,6 +67,11 @@ class PosController extends Controller {
             }
         }
 
+        // Fetch tables for dine-in selection
+        $db = Database::getInstance()->getConnection();
+        $tablesStmt = $db->query("SELECT id, table_number FROM tables WHERE status = 'empty' ORDER BY CAST(table_number AS UNSIGNED) ASC");
+        $tables = $tablesStmt->fetchAll();
+
         // Get tax & service charge settings from database
         $taxSettings = $this->settingModel->getTaxSettings();
 
@@ -75,6 +81,7 @@ class PosController extends Controller {
             'products' => $activeProducts,
             'settings' => $taxSettings,
             'shift' => $openShift,
+            'tables' => $tables,
             'isAppLayout' => false,
             'isPosLayout' => true
         ]);
