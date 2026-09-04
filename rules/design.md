@@ -61,6 +61,10 @@ This design system governs two distinct but unified modes:
 
 ### Layout, Spacing & Elevation (Operate)
 - **Density:** Higher density. Spacing uses smaller increments (4px, 8px, 16px, 24px) for menus, tables, and grids.
+- **Form Pages (Tambah & Edit Layout Rules):**
+  - **Always Include Sidebar & Topbar (`isAppLayout => true`):** Form views must render inside the standard application frame. Do not hide navigation elements.
+  - **Full-Width with Natural Height (`w-full`):** Form cards use `w-full` without vertical flex stretching (`flex-1` or `h-full` are strictly forbidden on form cards).
+  - **Tight Spacing & Close Action Bar:** Input fields use a 2-column grid (`grid-cols-1 md:grid-cols-2 gap-5`) or tight vertical spacing (`space-y-5`). Action buttons (Cancel/Save) must sit directly beneath the form fields with a subtle top border (`pt-4 border-t border-border`), eliminating giant vertical empty spaces.
 - **Cards/Containers:** Simple 1px borders, subtle or no shadows (max shadow-sm) to distinguish active areas.
 - **Sidebar/Nav:** Clean, collapsible or fixed sidebar with clear active states.
 - **KDS (Kitchen Display System):** Must be readable from a distance. High contrast. Large card views for orders. Color-coded by status (New, Preparing, Ready).
@@ -73,3 +77,4 @@ This design system governs two distinct but unified modes:
 3. **Always** ensure high contrast for text (especially in POS and KDS where glare or distance is a factor).
 4. **Never** misalign numbers in tables (always right-align currency/numbers).
 5. **Form Controls:** Inputs in the Admin/POS must have clear, visible boundaries (1px solid border). No floating/underline-only inputs.
+6. **Form Card Elevation & Stretching:** Never apply `flex-1` or `h-full` to form cards that pushes action buttons to the bottom of the viewport.

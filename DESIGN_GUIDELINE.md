@@ -41,14 +41,30 @@ Sistem *Operate* menuntut kejelasan dan kecepatan membaca, terutama pada layar p
   - Padding Vertikal: 8px (py-2)
   - Padding Horizontal: 12px (px-3)
 
-## 4. Elevasi (Borders & Shadows)
+## 4. Standar Halaman Form (Tambah & Edit)
+
+Seluruh halaman tambah dan edit data (Bahan Baku, Produk, Kategori, User, Pergerakan Stok, Stock Opname, Shift) wajib mematuhi aturan layout berikut:
+
+1. **Integrasi Sidebar & Topbar (`isAppLayout => true`)**:
+   - Seluruh halaman form berada di dalam struktur layout utama aplikasi (`layout.php`) dengan **Sidebar** dan **Topbar** yang tetap terlihat.
+   - **DILARANG** menyembunyikan sidebar/topbar (`isAppLayout => false`) pada halaman form internal.
+2. **Proporsi Lebar & Tinggi (Full Width, Natural Height)**:
+   - Kontainer form menggunakan `w-full space-y-6` agar mengisi area utama secara optimal.
+   - Kartu form (`bg-surface rounded-lg border border-border shadow-sm p-6`) **DILARANG menggunakan `flex-1` atau `h-full`** yang memaksa kartu memanjang secara vertikal ke bawah layar.
+   - Kartu harus memiliki **tinggi alami (*natural height*)** sesuai jumlah input.
+3. **Kepadatan & Posisi Tombol Aksi**:
+   - Bidang input dikelompokkan dengan rapi menggunakan `space-y-5` atau grid 2 kolom (`grid grid-cols-1 md:grid-cols-2 gap-5`).
+   - Tombol aksi (**Batal** dan **Simpan**) diletakkan **langsung di bawah bidang input** dengan pembatas garis halus (`pt-4 border-t border-border flex justify-end gap-3`).
+   - **DILARANG** menyisakan ruang kosong vertikal raksasa (*large empty void*) yang mendorong tombol ke batas bawah viewport.
+
+## 5. Elevasi (Borders & Shadows)
 
 - **Border Radius:** Kecil dan tegas (`rounded` atau `rounded-md`, maks 4px-6px).
 - **Shadow:** Sangat minimal (`shadow-sm`). Hindari shadow berat (drop-shadow blur tinggi).
 - **Borders:** Komponen form (input, select, textarea) **wajib** memiliki border 1px solid `#E5E7EB`.
 - **Backgrounds:** Gunakan warna solid flat. **DILARANG** menggunakan gradient.
 
-## 5. Komponen Form & Interaksi & Aturan UX (UI/UX Pro Max)
+## 6. Komponen Form & Interaksi & Aturan UX (UI/UX Pro Max)
 
 - **Tidak Ada Hover Layout-Shifting:** Dilarang menggeser layout saat hover, gunakan perubahan background/warna teks saja.
 - **Transisi Durasi yang Tepat:** Gunakan durasi `150-300ms` untuk perubahan state (transition-colors).

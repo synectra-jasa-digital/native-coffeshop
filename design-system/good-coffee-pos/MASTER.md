@@ -177,13 +177,17 @@
 **Pattern Name:** Hero + Features + CTA
 
 - **Conversion Strategy:** Deep CTA placement. For CTA label text, verify at least 4.5:1 against the button fill; use 7:1 only when the product explicitly targets AAA normal-text contrast. Keep focus and component boundaries independently visible. Disable hero parallax under reduced motion and render its static final state.
-- **CTA Placement:** Hero (sticky) + Bottom
-- **Section Order:** Hero with headline/image > Value prop > Key features (3-5) > CTA section > Footer
+### Form Page Pattern (Tambah & Edit)
+
+**Pattern Name:** Full-Width Integrated Form Card
+
+- **App Layout Integration:** Form pages must render inside the standard application layout (`isAppLayout => true`) with full Sidebar and Topbar visible.
+- **Card Sizing:** Use `w-full` for full width, but **NEVER** use `flex-1` or `h-full` to force cards to stretch vertically. Cards must take their natural height based on form contents.
+- **Form Grid & Action Bar:** Organize input fields into 2-column grids (`grid-cols-1 md:grid-cols-2 gap-5`) or compact vertical stacks (`space-y-5`). Place action buttons (Cancel / Save) immediately below the fields with a clean top border (`pt-4 border-t border-border`), avoiding large empty vertical spaces.
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
-
 
 ### Additional Forbidden Patterns
 
@@ -193,6 +197,7 @@
 - ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
 - ❌ **Instant state changes** — Always use transitions (150-300ms)
 - ❌ **Invisible focus states** — Focus states must be visible for a11y
+- ❌ **Vertical Flex-1 Stretching on Form Cards** — Do not use `flex-1` or `h-full` on form cards that pushes save/cancel buttons down to the bottom of the viewport leaving massive empty voids.
 
 ---
 
