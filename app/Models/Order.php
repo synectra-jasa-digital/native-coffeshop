@@ -18,8 +18,8 @@ class Order {
         $this->db->beginTransaction();
 
         try {
-            // 1. Insert Order
-            $stmt = $this->db->prepare("INSERT INTO orders (table_id, order_type, status, total_amount) VALUES (?, ?, 'completed', ?)");
+            // 1. Insert Order (Set status to 'pending' so it appears on KDS for Barista/Kitchen)
+            $stmt = $this->db->prepare("INSERT INTO orders (table_id, order_type, status, total_amount) VALUES (?, ?, 'pending', ?)");
             $stmt->execute([
                 $orderData['table_id'] ?? null,
                 $orderData['order_type'],
@@ -27,22 +27,9 @@ class Order {
             ]);
             $orderId = $this->db->lastInsertId();
 
-            // 2. Insert Order Items and Deduct Stock based on Recipe
+            // 2. Insert Order Items
             $itemStmt = $this->db->prepare("INSERT INTO order_items (order_id, product_id, variant_id, quantity, price, notes) VALUES (?, ?, ?, ?, ?, ?)");
             
-            // Prepare query for getting recipe
-            $recipeStmt = $this->db->prepare("SELECT ingredient_id, quantity FROM recipes WHERE product_id = ? AND (variant_id = ? OR variant_id IS NULL)");
-            
-            // Prepare query for stock deduction
-            $stockStmt = $this->db->prepare("UPDATE ingredients SET current_stock = current_stock - ? WHERE id = ?");
-
-            // Prepare query for stock movement log
-            $movementStmt = $this->db->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, reference_id, notes) VALUES (?, ?, 'out', ?, ?, ?)");
-
-            // Get user_id safely (fallback to 1 if testing without session)
-            $userId = \App\Core\Session::get('user_id');
-            if (!$userId) $userId = 1;
-
             foreach ($items as $item) {
                 // Insert Item
                 $itemStmt->execute([
@@ -53,22 +40,6 @@ class Order {
                     $item['price'],
                     $item['notes'] ?? ''
                 ]);
-
-                // Get Recipe for this item
-                $recipeStmt->execute([$item['product_id'], $item['variant_id'] ?? null]);
-                $recipes = $recipeStmt->fetchAll(\PDO::FETCH_ASSOC);
-
-                // Deduct stock for each ingredient in the recipe
-                foreach ($recipes as $recipe) {
-                    $totalDeduction = $recipe['quantity'] * $item['quantity'];
-                    
-                    // 1. Update total stock
-                    $stockStmt->execute([$totalDeduction, $recipe['ingredient_id']]);
-                    
-                    // 2. Log to stock movements
-                    $movementNotes = "Terjual: Order #" . $orderId;
-                    $movementStmt->execute([$recipe['ingredient_id'], $userId, $totalDeduction, $orderId, $movementNotes]);
-                }
             }
 
             // 3. Insert Transaction
