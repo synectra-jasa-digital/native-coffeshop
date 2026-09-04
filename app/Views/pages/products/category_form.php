@@ -10,6 +10,11 @@
     </div>
 </div>
 
+<!-- Alert -->
+<?php if (\App\Core\Session::hasFlash('error') || \App\Core\Session::hasFlash('success')): ?>
+    <!-- Handled by Layout Dialog -->
+<?php endif; ?>
+
 <div class="bg-surface border border-border rounded-lg shadow-sm max-w-lg">
     <form action="<?= BASE_URL ?>/categories/save<?= $category ? '/' . $category['id'] : '' ?>" method="POST" class="p-6 space-y-6">
         

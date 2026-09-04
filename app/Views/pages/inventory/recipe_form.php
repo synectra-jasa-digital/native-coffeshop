@@ -1,4 +1,4 @@
-<div x-data="recipeManager()" class="space-y-6">
+<div class="space-y-6" x-data="recipeManager()">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <div class="flex items-center gap-2 mb-2">
@@ -17,6 +17,48 @@
     <?php if (\App\Core\Session::hasFlash('error') || \App\Core\Session::hasFlash('success')): ?>
         <!-- Handled by Layout Dialog -->
     <?php endif; ?>
+
+    <!-- Form for Recipe Item (Hidden by default, shown via Alpine) -->
+    <div x-show="isFormOpen" x-collapse class="bg-surface border border-border rounded-lg shadow-sm mb-6" style="display: none;">
+        <form @submit.prevent="saveData" class="p-6">
+            <input type="hidden" x-model="formData.product_id">
+            <input type="hidden" x-model="formData.variant_id">
+            
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-textPrimary">Atur Bahan Baku</h3>
+                <button type="button" @click="closeModal()" class="text-textSecondary hover:text-danger">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label for="ingredient_id" class="block text-sm font-medium text-textSecondary mb-1">Pilih Bahan <span class="text-danger">*</span></label>
+                    <select x-model="formData.ingredient_id" id="ingredient_id" required class="block w-full rounded-md shadow-sm sm:text-sm transition-colors duration-200 focus:outline-none focus:ring-1 border-border text-textPrimary focus:border-primary focus:ring-primary border px-3 py-2 cursor-pointer">
+                        <option value="" disabled>-- Pilih Bahan --</option>
+                        <?php foreach($ingredients as $ing): ?>
+                            <option value="<?= $ing['id'] ?>"><?= htmlspecialchars($ing['name']) ?> (<?= htmlspecialchars($ing['unit']) ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-textSecondary mb-1">Takaran <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" x-model="formData.quantity" id="quantity" required class="block w-full rounded-md shadow-sm sm:text-sm transition-colors duration-200 focus:outline-none focus:ring-1 border-border text-textPrimary focus:border-primary focus:ring-primary border px-3 py-2">
+                    <p class="mt-1 text-xs text-textSecondary">Sesuaikan dengan satuan bahan yang dipilih.</p>
+                </div>
+            </div>
+
+            <div class="pt-4 mt-6 border-t border-border flex justify-end gap-3">
+                <button type="button" @click="closeModal()" class="inline-flex justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-textPrimary shadow-sm ring-1 ring-inset ring-border hover:bg-gray-50 transition-colors duration-200">
+                    Batal
+                </button>
+                <button type="submit" :disabled="isSubmitting" class="inline-flex justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors duration-200 disabled:opacity-50">
+                    <span x-show="!isSubmitting">Simpan</span>
+                    <span x-show="isSubmitting">Menyimpan...</span>
+                </button>
+            </div>
+        </form>
+    </div>
 
     <!-- Table -->
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -58,55 +100,12 @@
             </table>
         </div>
     </div>
-
-    <!-- Modal Form (For Recipe only since it's simple) -->
-    <div x-show="isModalOpen" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isModalOpen" x-transition.opacity class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="closeModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div x-show="isModalOpen" x-transition.scale class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                <form @submit.prevent="saveData">
-                    <input type="hidden" x-model="formData.product_id">
-                    <input type="hidden" x-model="formData.variant_id">
-                    
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Atur Bahan Baku</h3>
-                        <div class="mt-4 space-y-4">
-                            <div>
-                                <label for="ingredient_id" class="block text-sm font-medium text-gray-700">Pilih Bahan <span class="text-red-500">*</span></label>
-                                <select x-model="formData.ingredient_id" id="ingredient_id" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <option value="" disabled>-- Pilih Bahan --</option>
-                                    <?php foreach($ingredients as $ing): ?>
-                                        <option value="<?= $ing['id'] ?>"><?= htmlspecialchars($ing['name']) ?> (<?= htmlspecialchars($ing['unit']) ?>)</option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="quantity" class="block text-sm font-medium text-gray-700">Takaran <span class="text-red-500">*</span></label>
-                                <input type="number" step="0.01" x-model="formData.quantity" id="quantity" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                <p class="mt-1 text-xs text-gray-500">Sesuaikan dengan satuan bahan yang dipilih.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" :disabled="isSubmitting" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
-                            <span x-show="!isSubmitting">Simpan</span>
-                            <span x-show="isSubmitting">Menyimpan...</span>
-                        </button>
-                        <button type="button" @click="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            Batal
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
 function recipeManager() {
     return {
-        isModalOpen: false,
+        isFormOpen: false,
         isSubmitting: false,
         formData: {
             product_id: <?= $product['id'] ?>,
@@ -123,11 +122,13 @@ function recipeManager() {
                 this.formData.ingredient_id = '';
                 this.formData.quantity = '';
             }
-            this.isModalOpen = true;
+            this.isFormOpen = true;
+            // Scroll to form slightly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         
         closeModal() {
-            this.isModalOpen = false;
+            this.isFormOpen = false;
         },
         
         async saveData() {
