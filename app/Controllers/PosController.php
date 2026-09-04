@@ -114,7 +114,7 @@ class PosController extends Controller {
         // Validate and prepare data
         $orderData = [
             'order_type' => $data['order_type'] ?? 'dine_in',
-            'table_id' => $data['table_id'] ?? null,
+            'table_id' => !empty($data['table_id']) ? (int)$data['table_id'] : null,
             'total_amount' => $data['grand_total']
         ];
 

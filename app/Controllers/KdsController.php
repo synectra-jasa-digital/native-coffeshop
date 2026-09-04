@@ -95,8 +95,22 @@ class KdsController extends Controller {
 
         try {
             $db = Database::getInstance()->getConnection();
+            
+            // Check previous status
+            $checkStmt = $db->prepare("SELECT status FROM orders WHERE id = ?");
+            $checkStmt->execute([$orderId]);
+            $currentOrder = $checkStmt->fetch(\PDO::FETCH_ASSOC);
+            $previousStatus = $currentOrder['status'] ?? '';
+
             $stmt = $db->prepare("UPDATE orders SET status = ? WHERE id = ?");
             $stmt->execute([$newStatus, $orderId]);
+
+            // Deduct stock if order becomes completed for the first time
+            if ($newStatus === 'completed' && $previousStatus !== 'completed') {
+                $userId = Session::get('user_id') ?? 1;
+                $orderModel = new \App\Models\Order();
+                $orderModel->deductStockForOrder($orderId, $userId);
+            }
 
             $this->json(['success' => true, 'message' => 'Status berhasil diubah']);
         } catch (\Exception $e) {

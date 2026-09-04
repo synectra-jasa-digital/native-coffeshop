@@ -37,7 +37,7 @@ class Order {
             $stockStmt = $this->db->prepare("UPDATE ingredients SET current_stock = current_stock - ? WHERE id = ?");
 
             // Prepare query for stock movement log
-            $movementStmt = $this->db->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, notes) VALUES (?, ?, 'out', ?, ?)");
+            $movementStmt = $this->db->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, reference_id, notes) VALUES (?, ?, 'out', ?, ?, ?)");
 
             // Get user_id safely (fallback to 1 if testing without session)
             $userId = \App\Core\Session::get('user_id');
@@ -67,7 +67,7 @@ class Order {
                     
                     // 2. Log to stock movements
                     $movementNotes = "Terjual: Order #" . $orderId;
-                    $movementStmt->execute([$recipe['ingredient_id'], $userId, $totalDeduction, $movementNotes]);
+                    $movementStmt->execute([$recipe['ingredient_id'], $userId, $totalDeduction, $orderId, $movementNotes]);
                 }
             }
 
@@ -98,6 +98,44 @@ class Order {
         } catch (\Exception $e) {
             $this->db->rollBack();
             error_log('Order creation error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Deduct stock for an existing order (used when KDS order is completed)
+     */
+    public function deductStockForOrder($orderId, $userId = 1) {
+        try {
+            // Fetch order items
+            $itemStmt = $this->db->prepare("SELECT product_id, variant_id, quantity FROM order_items WHERE order_id = ?");
+            $itemStmt->execute([$orderId]);
+            $items = $itemStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            if (empty($items)) return false;
+
+            $recipeStmt = $this->db->prepare("SELECT ingredient_id, quantity FROM recipes WHERE product_id = ? AND (variant_id = ? OR variant_id IS NULL)");
+            $stockStmt = $this->db->prepare("UPDATE ingredients SET current_stock = current_stock - ? WHERE id = ?");
+            $movementStmt = $this->db->prepare("INSERT INTO stock_movements (ingredient_id, user_id, type, quantity, reference_id, notes) VALUES (?, ?, 'out', ?, ?, ?)");
+
+            foreach ($items as $item) {
+                $recipeStmt->execute([$item['product_id'], $item['variant_id'] ?? null]);
+                $recipes = $recipeStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                foreach ($recipes as $recipe) {
+                    $totalDeduction = (float)$recipe['quantity'] * (float)$item['quantity'];
+                    
+                    // Deduct stock
+                    $stockStmt->execute([$totalDeduction, $recipe['ingredient_id']]);
+                    
+                    // Record movement
+                    $movementNotes = "Terjual KDS: Order #" . $orderId;
+                    $movementStmt->execute([$recipe['ingredient_id'], $userId, $totalDeduction, $orderId, $movementNotes]);
+                }
+            }
+            return true;
+        } catch (\Exception $e) {
+            error_log('Stock deduction error for order ' . $orderId . ': ' . $e->getMessage());
             return false;
         }
     }
